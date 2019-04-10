@@ -1,14 +1,34 @@
+const clcikHandler = e => {
+    let card = e.currentTarget;
+    console.log(card.classList);
+    if(!card.classList.contains('show') && !card.classList.contains('match')){
+        card.classList.add('open','show');
+    }
+}
+
+//-----------------------------------------------------------------
+let cards = Array.from(document.querySelectorAll('.card'));
+let shuffldCared = shuffle(cards.slice());
+let deck = document.querySelector('.deck');
+for(let cardsCount=0; cardsCount<shuffldCared.length; cardsCount++){
+    deck.appendChild(shuffldCared[cardsCount]);
+    cards[cardsCount].addEventListener('click', clcikHandler)
+}
+
+
 /*
  * Create a list that holds all of your cards
  */
-
-
 /*
  * Display the cards on the page
  *   - shuffle the list of cards using the provided "shuffle" method below
  *   - loop through each card and create its HTML
  *   - add each card's HTML to the page
  */
+
+
+
+
 
 // Shuffle function from http://stackoverflow.com/a/2450976
 function shuffle(array) {
@@ -21,7 +41,6 @@ function shuffle(array) {
         array[currentIndex] = array[randomIndex];
         array[randomIndex] = temporaryValue;
     }
-
     return array;
 }
 
