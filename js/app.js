@@ -12,6 +12,10 @@ const checkCardsMatch = (card0, card1) => {
     return Array.from(card0.querySelector('i').classList).join(" ") === Array.from(card1.querySelector('i').classList).join(" ") ? true : false;
 }
 
+const updateMovesCounter = (movesCounter, movesCount) => {
+    movesCounter.innerText = movesCount;
+}
+
 const clickHandler = e => {
     let card = e.target.closest("LI");
     if (!card) return;
@@ -19,6 +23,9 @@ const clickHandler = e => {
     if(!card.classList.contains('show') && !card.classList.contains('match')){
         card.classList.add('open','show');
         openedCards.push(card);
+        movesCount++;
+        updateMovesCounter(movesCounter, movesCount);
+        console.log(movesCount, movesCount);
     }
     if(openedCards.length > 1){
         setTimeout(() => {
@@ -33,7 +40,9 @@ let shuffldCared = shuffle(allCards.slice());
 let deck = document.querySelector('.deck');
 let openedCards = [];
 let movesCount = 0;
+let movesCounter = document.querySelector('.moves');
 //-----------------------------------------------------------------
+updateMovesCounter(movesCounter, movesCount);
 deck.addEventListener('click', clickHandler, false);
 for(let cardsCount=0; cardsCount<shuffldCared.length; cardsCount++){
     deck.appendChild(shuffldCared[cardsCount]);
