@@ -1,6 +1,18 @@
+const emptyOpenedCards = () => {
+    openedCards.map(card => card.classList.remove('open','show'));
+    openedCards = [];
+}
+
 const clcikHandler = e => {
+    if (e.target.nodeName !== "LI") return;
+    console.log(e.target.nodeName === "LI");
     let card = e.currentTarget;
-    console.log(card.classList);
+    if(openedCards.length == 2){
+        emptyOpenedCards(openedCards);
+    }
+
+    openedCards.push(card);
+    // console.log(openedCards.length);
     if(!card.classList.contains('show') && !card.classList.contains('match')){
         card.classList.add('open','show');
     }
@@ -10,9 +22,12 @@ const clcikHandler = e => {
 let cards = Array.from(document.querySelectorAll('.card'));
 let shuffldCared = shuffle(cards.slice());
 let deck = document.querySelector('.deck');
+let openedCards = [];
+//-----------------------------------------------------------------
+deck.addEventListener('click', clcikHandler, false);
 for(let cardsCount=0; cardsCount<shuffldCared.length; cardsCount++){
     deck.appendChild(shuffldCared[cardsCount]);
-    cards[cardsCount].addEventListener('click', clcikHandler)
+    // cards[cardsCount].addEventListener('click', clcikHandler)
 }
 
 

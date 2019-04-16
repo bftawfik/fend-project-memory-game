@@ -55,8 +55,8 @@ h1 {
     height: 125px;
     width: 125px;
     background: #2e3d49;
+    color: #2e3d49;
     font-size: 0;
-    color: #ffffff;
     border-radius: 8px;
     cursor: pointer;
     display: flex;
@@ -73,6 +73,10 @@ h1 {
 
 .deck .card.show {
     font-size: 33px;
+    color: #ffffff;
+    background-color: #02b3e4;
+    animation-name: example;
+    animation-duration: 300ms;
 }
 
 .deck .card.match {
@@ -107,3 +111,17 @@ h1 {
     float: right;
     cursor: pointer;
 }
+
+
+@keyframes example {
+    from {
+        font-size: 0px;
+        color: #2e3d49;
+        ackground-color: #2e3d49;
+    }
+    to {
+        font-size: 33px;
+        color: #ffffff;
+        background-color: #02b3e4;
+    }
+  }
