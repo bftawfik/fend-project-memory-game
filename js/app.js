@@ -1,30 +1,40 @@
-const emptyOpenedCards = () => {
-    openedCards.map(card => card.classList.remove('open','show'));
-    openedCards = [];
+const flipCardBack = card => {
+    card.classList.remove('open','show');
+    openedCards = openedCards.filter(openCard => openCard !== card);
 }
 
-const clcikHandler = e => {
-    if (e.target.nodeName !== "LI") return;
-    console.log(e.target.nodeName === "LI");
-    let card = e.currentTarget;
-    if(openedCards.length == 2){
-        emptyOpenedCards(openedCards);
-    }
+const freezeCard = card => {
+    card.classList.add('match');
+    openedCards = openedCards.filter(openCard => openCard !== card);
+}
 
-    openedCards.push(card);
-    // console.log(openedCards.length);
+const checkCardsMatch = (card0, card1) => {
+    return Array.from(card0.querySelector('i').classList).join(" ") === Array.from(card1.querySelector('i').classList).join(" ") ? true : false;
+}
+
+const clickHandler = e => {
+    let card = e.target.closest("LI");
+    if (!card) return;
+
     if(!card.classList.contains('show') && !card.classList.contains('match')){
         card.classList.add('open','show');
+        openedCards.push(card);
+    }
+    if(openedCards.length > 1){
+        setTimeout(() => {
+            checkCardsMatch(...openedCards) ? openedCards.map(card => freezeCard(card)) :  openedCards.map(card => flipCardBack(card));
+        }, 500);
     }
 }
 
 //-----------------------------------------------------------------
-let cards = Array.from(document.querySelectorAll('.card'));
-let shuffldCared = shuffle(cards.slice());
+let allCards = Array.from(document.querySelectorAll('.card'));
+let shuffldCared = shuffle(allCards.slice());
 let deck = document.querySelector('.deck');
 let openedCards = [];
+let movesCount = 0;
 //-----------------------------------------------------------------
-deck.addEventListener('click', clcikHandler, false);
+deck.addEventListener('click', clickHandler, false);
 for(let cardsCount=0; cardsCount<shuffldCared.length; cardsCount++){
     deck.appendChild(shuffldCared[cardsCount]);
     // cards[cardsCount].addEventListener('click', clcikHandler)
