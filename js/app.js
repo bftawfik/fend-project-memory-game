@@ -4,6 +4,19 @@ const STAR_RATING_STEP = 8;
 const MAX_STAR_RATING_STEPS = 8;
 
 //-----------------------------------------------------------------
+const updateLocalGameData = () => {
+    console.log(localGameData.leaderboard);
+    localGameData.leaderboard.push({moves: movesCount, time: timeCount});
+    localGameData.leaderboard.sort((a, b) => {
+        if(a.moves !== b.moves ){
+            return a.moves - b.moves;
+        }
+        return a.time - b.time;
+    });
+    console.log(localGameData.leaderboard);
+    localGameData.leaderboard = localGameData.leaderboard.slice(0,3);
+    localStorage.setItem("BFT_1mac_memory_game", JSON.stringify(localGameData));
+}
 const updateTimer = (timer, timeCount) => {
     let s = timeCount % 60;
     s = s<10 ? "0"+s : s;
@@ -54,21 +67,35 @@ const resetGame = () => {
 }
 
 const restartClickHandler = e => {
-    resetGame();
+    // resetGame();
+    updateAndShowWinModal();
 }
 
-const updateAndShowWinModal = () => {
-    let winModalStars = Array.from(document.querySelectorAll('.win .stars li'));
-    for(let i=0; i < winModalStars.length; i++){
-        winModalStars[i].querySelector('i').classList.value = starsArray[i].querySelector('i').classList.value;
-    }
-    document.querySelector('.win .moves').innerText = movesCount;
-    let winModalTimer = document.querySelector('.win .timer .time');   
+const formatTime = timeCount => {
     let s = timeCount % 60;
     s = s<10 ? "0"+s : s;
     let m = Math.floor(timeCount / 60);
     m = m<10 ? "0"+m : m;
-    winModalTimer.innerText = m+":"+s;
+    return m+":"+s;
+}
+
+
+const updateAndShowWinModal = () => {
+    let winModalStars = Array.from(document.querySelectorAll('.win .user li'));
+    updateStarRating(winModalStars, movesCount);
+    document.querySelector('.win .moves').innerText = movesCount;
+    let winModalTimer = document.querySelector('.win .timer .time');
+    winModalTimer.innerText = formatTime(timeCount);
+
+    let winModalLeaderboard = Array.from(document.querySelectorAll('.win .leaderboard .record'));
+    localGameData.leaderboard.map((record, index) => {
+        if(localGameData.leaderboard[index].moves && localGameData.leaderboard[index].time){
+            winModalLeaderboard[index].querySelector('.timer .time').innerText = formatTime(record.time);
+            winModalLeaderboard[index].querySelector('.moves').innerText = record.moves;
+            updateStarRating(Array.from(winModalLeaderboard[index].querySelector('.stars').querySelectorAll('li')), record.moves);
+        }
+    })
+    
     winModal.style.display = "block";
 }
 
@@ -96,6 +123,7 @@ const freezeCard = card => {
     matchedCards++;
     if(matchedCards === ALL_CARDS_COUNT){
         console.log("you win!");
+        updateLocalGameData();
         timerStarted=false;
         updateAndShowWinModal();
     }
@@ -106,16 +134,21 @@ const checkCardsMatch = (card0, card1) => {
     return Array.from(card0.querySelector('i').classList).join(" ") === Array.from(card1.querySelector('i').classList).join(" ") ? true : false;
 }
 
-const updateStarRating = (movesCount) => {
+const updateStarRating = (starsArray, movesCount) => {
     let steps = Math.min(Math.ceil((movesCount-STAR_RATING_MAX) / STAR_RATING_STEP), MAX_STAR_RATING_STEPS);
     let halfStar = Boolean(steps % 2);
-    let wholeStars = Math.floor(steps / 2);
+    let lostStars = starsArray.length-Math.floor(steps / 2);
+    
+    starsArray.map((star, index) => {
+        star.querySelector('i').classList.remove('fa-star-half-o', 'fa-star-o');
+        star.querySelector('i').classList.add('fa-star');
+        if(index >= lostStars){
+            star.querySelector('i').classList.replace('fa-star', 'fa-star-o');
+        }
+    });
     if(halfStar){
-        starsArray[starsArray.length-1-wholeStars].querySelector('i').classList.replace('fa-star', 'fa-star-half-o');
+        starsArray[lostStars-1].querySelector('i').classList.replace('fa-star', 'fa-star-half-o');
     }
-    if(wholeStars > 0){
-        starsArray[starsArray.length-wholeStars].querySelector('i').classList.replace('fa-star-half-o', 'fa-star-o');
-    }  
 }
 
 const cardClickHandler = e => {
@@ -128,7 +161,7 @@ const cardClickHandler = e => {
         openedCards.push(card);
         movesCount++;
         updateMovesCounter(movesCounter, movesCount);
-        if(movesCount > STAR_RATING_MAX) updateStarRating(movesCount);   
+        if(movesCount > STAR_RATING_MAX) updateStarRating(starsArray, movesCount);   
     }
 
     if(openedCards.length == 2){
@@ -140,8 +173,6 @@ let resetBtn = document.querySelector('.score-panel .restart');
 let movesCounter = document.querySelector('.score-panel .moves');
 let starsArray = Array.from(document.querySelectorAll('.score-panel .stars li'));
 let timer = document.querySelector('.score-panel .timer .time');
-console.log(timer);
-
 let deck = document.querySelector('.deck');
 let winModal = document.querySelector('.win');
 let winModalCloseBtn = document.querySelector('.win .close');
@@ -149,12 +180,15 @@ let loseModal = document.querySelector('.lose');
 let loseModalCloseBtn = document.querySelector('.lose .close');
 let allCards = Array.from(document.querySelectorAll('.card'));
 let shuffldCared, openedCards, movesCount, matchedCards, timeCount, timerStarted, timerInterval;
+let gameData = {
+    leaderboard: [
+    ]
+};
 //-----------------------------------------------------------------
 resetBtn.addEventListener('click', restartClickHandler);
 deck.addEventListener('click', cardClickHandler);
 winModalCloseBtn.addEventListener('click', closeWinModalClickHandler);
 loseModalCloseBtn.addEventListener('click', closeLoseModalClickHandler);
-
 timerInterval = setInterval(() => {
     if(timerStarted){
         timeCount++;
@@ -162,8 +196,11 @@ timerInterval = setInterval(() => {
     }
 }, 1000);
 
-resetGame();
+let localGameData = JSON.parse(localStorage.getItem("BFT_1mac_memory_game")) || gameData;
 
+localStorage.setItem("BFT_1mac_memory_game", JSON.stringify(localGameData));
+
+resetGame();
 
 /*
  * Create a list that holds all of your cards

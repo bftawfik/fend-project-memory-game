@@ -207,3 +207,22 @@ h1 {
     text-decoration: none;
     cursor: pointer;
 }
+
+.leaderboard .record .recordId{
+    min-width: 40px;
+}
+
+.leaderboard .record .timer{
+    min-width: 90px;
+}
+
+.leaderboard .record p, .leaderboard .record .stars{
+    min-width: 100px;
+}
+
+
+.leaderboard .record .recordId, .leaderboard .record .timer, .leaderboard .record p, .leaderboard .record .stars{
+    display: inline-block;
+    padding: 0 5px;
+    margin: 0;
+}
