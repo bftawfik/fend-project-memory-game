@@ -67,8 +67,8 @@ const resetGame = () => {
 }
 
 const restartClickHandler = e => {
-    // resetGame();
-    updateAndShowWinModal();
+    resetGame();
+    // updateAndShowWinModal();
 }
 
 const formatTime = timeCount => {
